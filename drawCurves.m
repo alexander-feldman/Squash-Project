@@ -1,18 +1,22 @@
-function drawCurves (tracklets, points, xyModels, emptyCourt, cent)
-    minLength = 4; %min tracklet length
-    imshow(emptyCourt)
+function drawCurves (tracklets, points, xyModels, connections, emptyCourt, cent)
+    %draws the plots on top of emptyCourt
+
+    imshow(emptyCourt) %draw empty court image
  
     hold on
-
+    
+    %draw all detections in black
     for i=1:length(cent)
         for j=1:size(cent{i},1)
-            plot([cent{i}(j,1), 1280], [cent{i}(j,2), 720], '*', 'MarkerSize', 4, 'MarkerEdgeColor', 'k');      
+            plot([cent{i}(j,1), 1280], [cent{i}(j,2), 720], '*', 'MarkerSize', 4, 'MarkerEdgeColor', 'k');
         end
     end
+    %draw all points in red
     for i=1:length(points)
         plot([points(i).xDim, 1280], [points(i).yDim, 720], '*', 'MarkerSize', 2, 'MarkerEdgeColor', 'r');
     end
     
+    %draw all curves in blue
     dx = 5; %lower is more precise
     for i=1:length(xyModels)  
         %generate points array
@@ -57,74 +61,15 @@ function drawCurves (tracklets, points, xyModels, emptyCourt, cent)
     end
     
     
-    %draw connections from xyModels
-    for i=1:length(xyModels) - 1
-        p1 = xyModels(i).model.p1;
-        p2 = xyModels(i).model.p2;
-        p3 = xyModels(i).model.p3;
-        q1 = xyModels(i + 1).model.p1;
-        q2 = xyModels(i + 1).model.p2;
-        q3 = xyModels(i + 1).model.p3;
-        
-        syms x
-        prevFunc = p1 * (x ^ 2) + p2 * x + p3;
-        nextFunc = q1 * (x ^ 2) + q2 * x + q3;
-        solx = solve(prevFunc == nextFunc, x, 'Real', true);
-        
-        %make endpoints actual function endpoints, not last support point
-        prevFuncIntervalStart = tracklets(xyModels(i).trackletID).model.xFit(points(tracklets(xyModels(i).trackletID).lastSupIdx).frame);
-        nextFuncIntervalStart = tracklets(xyModels(i + 1).trackletID).model.xFit(points(tracklets(xyModels(i + 1).trackletID).firstSupIdx).frame);
-        
-        intersection = [];
-        distance = inf;
-        for j=1:length(solx) %find the closest solution to equation
-            if distance > abs(solx(j) - prevFuncIntervalStart) + abs(solx(j) - nextFuncIntervalStart)
-                distance = abs(solx(j) - prevFuncIntervalStart) + abs(solx(j) - nextFuncIntervalStart);
-                intersection = double(solx(j));
-            end
+    %draw all connections in yellow
+    for i=1:length(connections)
+        if ~isempty(connections(i).prevModel)
+            fplot(connections(i).prevModel, [connections(i).prevStartPoint, connections(i).prevEndPoint], 'linewidth', 3, 'color', 'y');
         end
-        
-        %if they don't intersect in middle of function
-        if points(tracklets(xyModels(i).trackletID).lastSupIdx).xDim >... %left to right
-                points(tracklets(xyModels(i).trackletID).firstSupIdx).xDim
-            if intersection > prevFuncIntervalStart %if doesn't intersect in midde of func
-                if intersection > prevFuncIntervalStart %order interval from least to greatest
-                    fplot(prevFunc, [prevFuncIntervalStart, intersection], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                else
-                    fplot(prevFunc, [intersection, prevFuncIntervalStart], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                end
-            end
-        else %right to left
-            if intersection < prevFuncIntervalStart %if doesn't intersect in midde of func
-                if intersection > prevFuncIntervalStart %order interval from least to greatest
-                    fplot(prevFunc, [prevFuncIntervalStart, intersection], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                else
-                    fplot(prevFunc, [intersection, prevFuncIntervalStart], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                end
-            end
+        if ~isempty(connections(i).nextModel)
+            fplot(connections(i).nextModel, [connections(i).nextStartPoint, connections(i).nextEndPoint], 'linewidth', 3, 'color', 'y');
         end
-        
-        %same for nextFunc
-        if points(tracklets(xyModels(i + 1).trackletID).lastSupIdx).xDim >... %left to right
-                points(tracklets(xyModels(i + 1).trackletID).firstSupIdx).xDim
-            if intersection < nextFuncIntervalStart %if doesn't intersect in midde of func
-                if intersection > nextFuncIntervalStart  %order interval from least to greatest 
-                    fplot(nextFunc, [nextFuncIntervalStart, intersection], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                else
-                    fplot(nextFunc, [intersection, nextFuncIntervalStart], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                end
-            end
-        else %right to left
-            if intersection > nextFuncIntervalStart %if doesn't intersect in midde of func
-                if intersection > nextFuncIntervalStart  %order interval from least to greatest 
-                    fplot(nextFunc, [nextFuncIntervalStart, intersection], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                else
-                    fplot(nextFunc, [intersection, nextFuncIntervalStart], 'linewidth', 3, 'color', 'y'); %plot the curve in between
-                end
-            end
-        end
-        
     end
-
+    
     hold off
 end

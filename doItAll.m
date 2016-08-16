@@ -9,7 +9,7 @@ function doItAll(video, emptyCourt, frameStart, frameEnd)
     grayVid = vidRGB2GRAY(video(:,:,:,frameStart:frameEnd));
     
     %convert to smoothed difference videos
-    disp('converting to smoothed difference videos');
+    disp('generating smoothed difference videos');
     diffVid1 = toSmoothedDiff(grayVid, 1);
     diffVid2 = toSmoothedDiff(grayVid, 4);
     
@@ -23,14 +23,14 @@ function doItAll(video, emptyCourt, frameStart, frameEnd)
     
     %improve tracklets
     disp('improving tracklets');
-    [tracklets, points] = improveTracklets(tracklets, points);
+    [tracklets, points, xyModels] = improveTracklets(tracklets, points);
     
     %connect tracklets
     disp('connecting tracklets');
-    [tracklets, points, xyModels] = connectTracklets(tracklets, points);
+    connections = connectTracklets(tracklets, points, xyModels);
 
     %draw curves
     disp('drawing curves');
-    drawCurves(tracklets, points, xyModels, emptyCourt, cent);
+    drawCurves(tracklets, points, xyModels, connections, emptyCourt, cent);
 
 end
