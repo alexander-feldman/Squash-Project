@@ -1,6 +1,6 @@
 This is my MATLAB squash ball tracking program. A full description can be found [on my blog](http://felday.info/projects/2016/08/16/Squash-Ball-Tracking.html). 
 
-Basically it turns clips of squash this into this:
+Basically it turns clips of squash into this:
 ![Output image](http://i.imgur.com/20CSBmj.jpg)
 
 
