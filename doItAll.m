@@ -1,4 +1,8 @@
 function doItAll(video, emptyCourt, frameStart, frameEnd)
+    %video is RGB
+    %emptyCourt is background image to display curves on top of
+    %frameStart and frameEnd (optional) are the sections of video to process.
+
     if nargin == 2
         frameStart = 1;
         frameEnd = size(video, 4);
