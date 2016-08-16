@@ -1,9 +1,6 @@
 This is my MATLAB squash ball tracking program. A full description can be found [on my blog](http://felday.info/projects/2016/08/16/Squash-Ball-Tracking.html). 
 
-Basically it turns this:
-![Animated Squash Clip](https://media.giphy.com/media/3o6Zt89eg01OUTaD16/giphy.gif )
-
-into this:
+Basically it turns clips of squash this into this:
 ![Output image](http://i.imgur.com/20CSBmj.jpg)
 
 
